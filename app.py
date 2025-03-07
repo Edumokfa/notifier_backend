@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 import datetime
-from controllers import mail_sender_controller
+from controllers import mail_sender_controller, whatsapp_controller
+from connectors import mysql_connector
 
 
 app = Flask(__name__)
@@ -53,5 +54,23 @@ def notificar():
 def auditoria():
     return jsonify(notificacoes)
 
+@app.route('/createTables', methods=['GET'])
+def pewee():
+    return mysql_connector.createTables()
+
+@app.route('/insertTables', methods=['POST'])
+def insertEnv():
+    data = request.json
+    return mysql_connector.insertEnv(data['name'], data['cpfCnpj'], data['whatsappAccessToken'], data['whatsappPhoneNumber'], data['whatsappBusinessId'], data['email'], data['emailToken'])
+
+@app.route('/sendFirstMessage', methods=['POST'])
+def sendFirstMessage():
+    data = request.json
+    return whatsapp_controller.send_first_message(data['phone_number'], data['key_wpp'], data['template_wpp'], data['bot_name'])
+
+@app.route('/webhook', methods=['GET'])
+def configureWebhook():
+    return whatsapp_controller.whatsapp_webhook(request)
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=True)

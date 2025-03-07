@@ -2,7 +2,7 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
-def enviar_email(destinatario, assunto, mensagem, remetente="100559@aluno.uricer.edu.br", senha="03196155021"):
+def enviar_email(destinatario, assunto, mensagem, remetente, senha):
     try:
         servidor = smtplib.SMTP("smtp.gmail.com", 587)
         servidor.starttls()
