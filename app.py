@@ -66,7 +66,7 @@ def insertEnv():
 @app.route('/sendFirstMessage', methods=['POST'])
 def sendFirstMessage():
     data = request.json
-    return whatsapp_controller.send_first_message(data['phone_number'], data['key_wpp'], data['template_wpp'], data['bot_name'])
+    return whatsapp_controller.send_first_message(data['phone_number'], data['key_wpp'], data['template_wpp'], data['phone_number_id'], data['components'])
 
 @app.route('/webhook', methods=['GET'])
 def configureWebhook():

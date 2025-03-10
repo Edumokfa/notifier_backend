@@ -44,8 +44,9 @@ def send_whatsapp_message(phone_number, message, phone_number_id, key_wpp):
     except requests.exceptions.RequestException as error:
         print(error)
 
-def send_first_message(phone_number, key_wpp, template_wpp, bot_name, phone_number_id):
+def send_first_message(phone_number, key_wpp, template_wpp, phone_number_id, components):
     url = f"{os.getenv('FACEBOOK_API_URL')}{phone_number_id}/messages?access_token={key_wpp}"
+    
     message = {
         "messaging_product": "whatsapp",
         "to": phone_number,
@@ -53,22 +54,17 @@ def send_first_message(phone_number, key_wpp, template_wpp, bot_name, phone_numb
         "template": {
             "name": template_wpp,
             "language": {"code": "pt_BR"},
-            "components": [
-                {
-                    "type": "body",
-                    "parameters": [
-                        {
-                            "type": "text",
-                            "text": bot_name,
-                        }
-                    ],
-                }
-            ],
+            "components": components
         },
     }
+    
     try:
         response = requests.post(url, json=message)
         response.raise_for_status()
         return response.json()
     except requests.exceptions.RequestException as error:
-        return {"error": 404, "message": str(error), "details": response.text if response else "Sem resposta do servidor"}
+        return {
+            "error": getattr(error.response, "status_code", 500),
+            "message": str(error),
+            "details": getattr(error.response, "text", "Sem resposta do servidor")
+        }
