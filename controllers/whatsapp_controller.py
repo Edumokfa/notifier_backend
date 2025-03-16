@@ -1,6 +1,7 @@
 from flask import jsonify
 import os
 import requests
+from controllers.history_controller import createHistory
 
 def whatsapp_webhook(request):
     mode = request.args.get("hub.mode")
@@ -61,6 +62,7 @@ def send_first_message(phone_number, key_wpp, template_wpp, phone_number_id, com
     try:
         response = requests.post(url, json=message)
         response.raise_for_status()
+        createHistory(phone_number, "Enviou mensagem")
         return response.json()
     except requests.exceptions.RequestException as error:
         return {
