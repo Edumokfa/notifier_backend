@@ -17,6 +17,7 @@ const sequelize = new Sequelize(
       acquire: 30000,
       idle: 10000
     },
+    timezone: '-03:00',
     logging: process.env.NODE_ENV === 'development' ? console.log : false
   }
 );
