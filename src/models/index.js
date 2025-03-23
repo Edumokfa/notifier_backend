@@ -1,5 +1,6 @@
 const User = require('./User');
 const Contact = require('./Contact');
+const Template = require('./Template');
 const { sequelize } = require('../config/database');
 
 const syncModels = async () => {
@@ -15,5 +16,6 @@ const syncModels = async () => {
 module.exports = {
   User,
   Contact,
+  Template,
   syncModels
 };

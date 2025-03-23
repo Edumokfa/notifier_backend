@@ -14,6 +14,7 @@ app.use(cors());
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/whatsapp', require('./routes/whatsappRoutes'));
 app.use('/api/contacts', require('./routes/contactRoutes'));
+app.use('/api/template', require('./routes/templateRoutes'));
 app.get('/', (req, res) => {
   res.send('API está funcionando!');
 });

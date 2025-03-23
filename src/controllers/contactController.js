@@ -98,9 +98,6 @@ exports.updateContact = async (req, res) => {
   }
 };
 
-// @desc    Excluir um contato
-// @route   DELETE /api/contacts/:id
-// @access  Private
 exports.deleteContact = async (req, res) => {
   try {
     const contact = await Contact.findOne({
