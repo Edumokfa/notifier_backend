@@ -33,6 +33,11 @@ exports.sendFirstMessage = async (req, res) => {
     return res.status(200).json(response);
 }
 
+exports.sendFirstMessageFromCron = async (phoneNumber, keyWpp, templateWpp, phoneNumberId, components) => {
+    var response = await sendFirstMessage(phoneNumber, keyWpp, templateWpp, phoneNumberId, components);
+    return !response.error;
+}
+
 
 // Função para enviar uma mensagem via WhatsApp
 async function sendWhatsappMessage(phoneNumber, message, phoneNumberId, keyWpp) {
@@ -52,10 +57,11 @@ async function sendWhatsappMessage(phoneNumber, message, phoneNumberId, keyWpp) 
     }
 }
 
-// Função para enviar uma mensagem inicial via template
 async function sendFirstMessage(phoneNumber, keyWpp, templateWpp, phoneNumberId, components) {
     const url = `${process.env.FACEBOOK_API_URL}${phoneNumberId}/messages?access_token=${keyWpp}`;
-    console.log(url);
+
+    const updatedComponents = components.map(({ text, ...rest }) => rest);
+
     const message = {
         messaging_product: 'whatsapp',
         to: phoneNumber,
@@ -63,13 +69,12 @@ async function sendFirstMessage(phoneNumber, keyWpp, templateWpp, phoneNumberId,
         template: {
             name: templateWpp,
             language: { code: 'pt_BR' },
-            components: components,
+            components: updatedComponents,
         },
     };
 
     try {
         const response = await axios.post(url, message);
-        //await createHistory(phoneNumber, 'Enviou mensagem');
         return response.data;
     } catch (error) {
         return {

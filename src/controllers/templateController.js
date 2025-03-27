@@ -59,6 +59,7 @@ exports.createTemplate = async (req, res) => {
       data: template
     });
   } catch (error) {
+    console.log(error);
     res.status(500).json({
       success: false,
       message: error.message

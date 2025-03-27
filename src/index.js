@@ -3,6 +3,7 @@ const dotenv = require('dotenv');
 const cors = require('cors');
 const { connectDB } = require('./config/database');
 const { syncModels } = require('./models');
+require('./controllers/cronController');
 
 dotenv.config();
 
@@ -15,6 +16,7 @@ app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/whatsapp', require('./routes/whatsappRoutes'));
 app.use('/api/contacts', require('./routes/contactRoutes'));
 app.use('/api/template', require('./routes/templateRoutes'));
+app.use('/api/messageConfig', require('./routes/messageConfigRoutes'));
 app.get('/', (req, res) => {
   res.send('API está funcionando!');
 });
