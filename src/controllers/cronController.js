@@ -50,7 +50,7 @@ async function executeScheduledMessages() {
                             }
                             return component;
                         });
-                        WhatsappController.sendFirstMessageFromCron(contact.phone, message.template.key_wpp, message.template.template_wpp, message.template.phone_number_id, updatedMessageTemplate);
+                        WhatsappController.sendFirstMessageFromCron(message.userId, contact.phone, message.template.key_wpp, message.template.template_wpp, message.template.phone_number_id, updatedMessageTemplate);
                     }
                 });
             }

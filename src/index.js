@@ -17,6 +17,7 @@ app.use('/api/whatsapp', require('./routes/whatsappRoutes'));
 app.use('/api/contacts', require('./routes/contactRoutes'));
 app.use('/api/template', require('./routes/templateRoutes'));
 app.use('/api/messageConfig', require('./routes/messageConfigRoutes'));
+app.use('/api/messageHistory', require('./routes/messageHistoryRoutes'));
 app.get('/', (req, res) => {
   res.send('API está funcionando!');
 });
