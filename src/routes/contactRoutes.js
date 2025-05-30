@@ -5,9 +5,9 @@ const {
   createContact, 
   updateContact, 
   deleteContact,
-  updatePreferences
-} = require('../controllers/contactcontroller');
-
+  updatePreferences,
+  importContacts
+} = require('../controllers/contactController');
 const { protect } = require('../middleware/auth');
 
 const router = express.Router();
@@ -25,5 +25,8 @@ router.route('/:id')
 
 router.route('/:id/preferences')
   .patch(updatePreferences);
+
+router.route('/import')
+  .post(importContacts)
 
 module.exports = router;

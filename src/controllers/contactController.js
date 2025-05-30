@@ -164,3 +164,36 @@ exports.updatePreferences = async (req, res) => {
     });
   }
 };
+
+exports.importContacts = async (req, res) => {
+  try {
+    const contacts = req.body.contacts;
+
+    if (!Array.isArray(contacts) || contacts.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Nenhum contato válido enviado.'
+      });
+    }
+
+    const contactsWithUser = contacts.map(contact => ({
+      name: contact.name,
+      email: contact.email,
+      phone: contact.phone,
+      userId: req.user.id,
+    }));
+
+    await Contact.bulkCreate(contactsWithUser);
+
+    res.status(201).json({
+      success: true,
+      count: contactsWithUser.length,
+      message: 'Contatos importados com sucesso.'
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};

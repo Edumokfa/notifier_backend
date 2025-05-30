@@ -1,13 +1,11 @@
-FROM python:3.11
+FROM node:18
 
 WORKDIR /app
 
-COPY . /app
+COPY . .
 
-RUN pip install --upgrade pip
+RUN npm install
 
-RUN pip install --no-cache-dir -r requirements.txt
+EXPOSE 5000
 
-EXPOSE 8000
-
-CMD ["python", "app.py"]
+CMD ["npm", "start"]

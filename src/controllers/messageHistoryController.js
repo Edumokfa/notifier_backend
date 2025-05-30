@@ -20,7 +20,7 @@ exports.getHistories = async (req, res) => {
   }
 };
 
-exports.createHistory = async (userId, phoneNumber, request, response, status, messageId) => {
+exports.createHistory = async (userId, phoneNumber, request, response, status, messageId, messageStatus) => {
   try {
     const history = await MessageHistory.create({
         userId,
@@ -28,8 +28,10 @@ exports.createHistory = async (userId, phoneNumber, request, response, status, m
         requestPayload: request,
         responsePayload: response || 'Sem resposta do servidor',
         statusCode: status,
-        messageId
+        messageId,
+        messageStatus: messageStatus || 'failed',
     });
+    console.log('histórico criado')
   } catch (error) {
     console.log(error);
   }

@@ -94,10 +94,10 @@ async function sendFirstMessage(userId, phoneNumber, keyWpp, templateWpp, phoneN
 
     try {
         const response = await axios.post(url, message);
-        createHistory(userId, phoneNumber, message, response.data, 200, response.data.messages[0].id);
+        createHistory(userId, phoneNumber, message, response.data, 200, response.data.messages[0].id, 'sent');
         return response.data;
     } catch (error) {
-        createHistory(userId, phoneNumber, message, error.response?.data, error.response?.status || 500, null);
+        createHistory(userId, phoneNumber, message, error.response?.data, error.response?.status || 500, null, 'failed');
         return {
             error: error.response?.status || 500,
             message: error.message,
