@@ -11,7 +11,7 @@ const MessageHistory = sequelize.define('MessageHistory', {
           key: 'id'
         }
     },
-    phoneNumber: {
+    contact: {
         type: DataTypes.STRING,
         allowNull: false,
     },
@@ -34,6 +34,11 @@ const MessageHistory = sequelize.define('MessageHistory', {
     messageId: {
         type: DataTypes.STRING,
         allowNull: true,
+    },
+    channelType: {
+        type: DataTypes.ENUM('whatsapp', 'email'),
+        allowNull: false,
+        defaultValue: 'whatsapp',
     }
 }, {
     timestamps: true,
