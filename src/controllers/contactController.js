@@ -3,7 +3,7 @@ const { Contact, User } = require('../models');
 exports.getContacts = async (req, res) => {
   try {
     const contacts = await Contact.findAll({
-      where: { userId: req.user.id },
+      where: { userId: req.user.referenceUser ?? req.user.id },
       order: [['name', 'ASC']]
     });
     
@@ -25,7 +25,7 @@ exports.getContact = async (req, res) => {
     const contact = await Contact.findOne({
       where: { 
         id: req.params.id,
-        userId: req.user.id
+        userId: req.user.referenceUser ?? req.user.id
       }
     });
     
@@ -50,7 +50,7 @@ exports.getContact = async (req, res) => {
 
 exports.createContact = async (req, res) => {
   try {
-    req.body.userId = req.user.id;
+    req.body.userId = req.user.referenceUser ?? req.user.id;
     
     const contact = await Contact.create(req.body);
     
@@ -71,7 +71,7 @@ exports.updateContact = async (req, res) => {
     let contact = await Contact.findOne({
       where: { 
         id: req.params.id,
-        userId: req.user.id
+        userId: req.user.referenceUser ?? req.user.id
       }
     });
     
@@ -103,7 +103,7 @@ exports.deleteContact = async (req, res) => {
     const contact = await Contact.findOne({
       where: { 
         id: req.params.id,
-        userId: req.user.id
+        userId: req.user.referenceUser ?? req.user.id
       }
     });
     
@@ -135,7 +135,7 @@ exports.updatePreferences = async (req, res) => {
     let contact = await Contact.findOne({
       where: { 
         id: req.params.id,
-        userId: req.user.id
+        userId: req.user.referenceUser ?? req.user.id
       }
     });
     
@@ -180,7 +180,7 @@ exports.importContacts = async (req, res) => {
       name: contact.name,
       email: contact.email,
       phone: contact.phone,
-      userId: req.user.id,
+      userId: req.user.referenceUser ?? req.user.id,
     }));
 
     await Contact.bulkCreate(contactsWithUser);

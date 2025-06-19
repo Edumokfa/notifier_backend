@@ -11,7 +11,7 @@ exports.register = async (req, res) => {
   try {
     const { name, email, password } = req.body;
     
-    const userExists = await User.findOne({ email });
+    const userExists = await User.findOne({ where: { email: email }});
     
     if (userExists) {
       return res.status(400).json({
@@ -86,7 +86,8 @@ exports.login = async (req, res) => {
       user: {
         id: user.id,
         name: user.name,
-        email: user.email
+        email: user.email,
+        role: user.role
       }
     });
   } catch (error) {
@@ -110,6 +111,7 @@ exports.getMe = async (req, res) => {
         id: user.id,
         name: user.name,
         email: user.email,
+        role: user.role,
         createdAt: user.createdAt
       }
     });

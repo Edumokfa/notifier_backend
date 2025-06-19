@@ -13,6 +13,7 @@ const User = sequelize.define('User', {
   email: {
     type: DataTypes.STRING,
     allowNull: false,
+    unique: true,
     validate: {
       isEmail: true
     }
@@ -23,6 +24,21 @@ const User = sequelize.define('User', {
     validate: {
       len: [6, 100]
     }
+  },
+  role: {
+    type: DataTypes.ENUM('user', 'admin'),
+    defaultValue: 'user',
+    allowNull: false
+  },
+  referenceUser: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    references: {
+      model: 'Users',
+      key: 'id'
+    },
+    onDelete: 'SET NULL',
+    onUpdate: 'CASCADE'
   }
 }, {
   hooks: {
@@ -44,5 +60,6 @@ const User = sequelize.define('User', {
 User.prototype.matchPassword = async function(enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
+User.belongsTo(User, { as: 'creator', foreignKey: 'referenceUser' });
 
 module.exports = User;

@@ -2,6 +2,7 @@ const cron = require('node-cron');
 const { Op } = require('sequelize');
 const MessageConfig = require('../models/MessageConfig');
 const WhatsappController = require('../controllers/whatsappController');
+const MailController = require('../controllers/mailController');
 const { Contact } = require('../models');
 require('dotenv').config();
 
@@ -43,11 +44,13 @@ async function executeScheduledMessages() {
                 });
                 message.update({ nextExecutionDate: message.updateNextExecutionDate() });
                 contacts.forEach(contact => {
-                    notificationQueue.add('sendNotification', {
-                        type: message.channelType,
-                        contact: contact,
-                        message: message,
-                      });
+                    if ((contact.recebeEmail && message.channelType === 'email') || (contact.recebeWhatsapp && message.channelType === 'whatsapp')) {
+                        notificationQueue.add('sendNotification', {
+                            type: message.channelType,
+                            contact: contact,
+                            message: message,
+                        });
+                    }
                 });
             }
         }
@@ -58,7 +61,7 @@ async function executeScheduledMessages() {
 
 async function sendNotification(type, contact, message) {
     if (type === 'email') {
-
+        MailController.sendMail(message, contact);
     } else if (type === 'sms') {
 
     } else if (type === 'whatsapp') {
@@ -81,3 +84,5 @@ async function sendNotification(type, contact, message) {
 cron.schedule('* * * * *', () => {
     executeScheduledMessages();
 });
+
+module.exports = { notificationQueue };

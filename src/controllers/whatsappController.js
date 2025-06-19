@@ -2,7 +2,7 @@ const axios = require('axios');
 require('dotenv').config();
 
 const { createHistory } = require('../controllers/MessageHistoryController');
-const { MessageConfig, MessageHistory, User } = require('../models');
+const { MessageHistory, User } = require('../models');
 
 exports.webhook = async (req, res) => {
     const data = req.body;
@@ -45,7 +45,7 @@ exports.configureWebhook = async (req, res) => {
   };
 
 exports.sendFirstMessage = async (req, res) => {
-    var response = await sendFirstMessage(req.user.id, req.body.phone_number, req.body.key_wpp, req.body.template_wpp, req.body.phone_number_id, req.body.components);
+    var response = await sendFirstMessage(req.user.referenceUser ?? req.user.id, req.body.phone_number, req.body.key_wpp, req.body.template_wpp, req.body.phone_number_id, req.body.components);
     if (response.error) {
         return res.status(400).json({ error: response });
     }
@@ -94,10 +94,10 @@ async function sendFirstMessage(userId, phoneNumber, keyWpp, templateWpp, phoneN
 
     try {
         const response = await axios.post(url, message);
-        createHistory(userId, phoneNumber, message, response.data, 200, response.data.messages[0].id, 'sent');
+        createHistory(userId, phoneNumber, message, response.data, 200, response.data.messages[0].id, 'sent', 'whatsapp');
         return response.data;
     } catch (error) {
-        createHistory(userId, phoneNumber, message, error.response?.data, error.response?.status || 500, null, 'failed');
+        createHistory(userId, phoneNumber, message, error.response?.data, error.response?.status || 500, null, 'failed', 'whatsapp');
         return {
             error: error.response?.status || 500,
             message: error.message,

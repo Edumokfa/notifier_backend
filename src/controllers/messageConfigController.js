@@ -28,7 +28,7 @@ exports.createMessageConfig = async (req, res) => {
     }
 
     const messageConfig = await MessageConfig.create({
-      userId: req.user.id,
+      userId: req.user.referenceUser ?? req.user.id,
       channelType,
       emailConfig: channelType === 'email' ? emailConfig : null,
       executionFrequency,
@@ -56,7 +56,7 @@ exports.createMessageConfig = async (req, res) => {
 exports.getMessageConfigs = async (req, res) => {
   try {
     const messageConfigs = await MessageConfig.findAll({
-      where: { userId: req.user.id },
+      where: { userId: req.user.referenceUser ?? req.user.id },
       include: [
         {
           model: Template,
@@ -99,7 +99,7 @@ exports.updateMessageConfig = async (req, res) => {
     let messageConfig = await MessageConfig.findOne({
       where: { 
         id, 
-        userId: req.user.id 
+        userId: req.user.referenceUser ?? req.user.id 
       }
     });
 
@@ -152,7 +152,7 @@ exports.deleteMessageConfig = async (req, res) => {
     const messageConfig = await MessageConfig.findOne({
       where: { 
         id, 
-        userId: req.user.id 
+        userId: req.user.referenceUser ?? req.user.id
       }
     });
 

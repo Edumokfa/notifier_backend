@@ -5,11 +5,11 @@ const {
   updateMessageConfig,
   deleteMessageConfig
 } = require('../controllers/messageConfigController');
-const { protect } = require('../middleware/auth');
+const { protect, isAdmin } = require('../middleware/auth');
 
 const router = express.Router();
 
-router.use(protect);
+router.use(protect, isAdmin);
 
 router.route('/')
   .post(createMessageConfig)

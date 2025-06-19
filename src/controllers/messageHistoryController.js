@@ -3,7 +3,7 @@ const { MessageHistory } = require('../models');
 exports.getHistories = async (req, res) => {
   try {
     const histories = await MessageHistory.findAll({
-      where: { userId: req.user.id },
+      where: { userId: req.user.referenceUser ?? req.user.id },
     });
     
     res.status(200).json({
@@ -20,7 +20,7 @@ exports.getHistories = async (req, res) => {
   }
 };
 
-exports.createHistory = async (userId, phoneNumber, request, response, status, messageId, messageStatus) => {
+exports.createHistory = async (userId, phoneNumber, request, response, status, messageId, messageStatus, messageChannel) => {
   try {
     const history = await MessageHistory.create({
         userId,
@@ -30,6 +30,7 @@ exports.createHistory = async (userId, phoneNumber, request, response, status, m
         statusCode: status,
         messageId,
         messageStatus: messageStatus || 'failed',
+        messageChannel: messageChannel
     });
     console.log('histórico criado')
   } catch (error) {

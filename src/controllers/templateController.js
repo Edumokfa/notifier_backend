@@ -3,7 +3,7 @@ const { Template, User } = require('../models');
 exports.getTemplates = async (req, res) => {
   try {
     const templates = await Template.findAll({
-      where: { userId: req.user.id },
+      where: { userId: req.user.referenceUser ?? req.user.id },
       order: [['name', 'ASC']]
     });
     
@@ -25,7 +25,7 @@ exports.getTemplate = async (req, res) => {
     const template = await Template.findOne({
       where: { 
         id: req.params.id,
-        userId: req.user.id
+        userId: req.user.referenceUser ?? req.user.id
       }
     });
     
@@ -50,7 +50,7 @@ exports.getTemplate = async (req, res) => {
 
 exports.createTemplate = async (req, res) => {
   try {
-    req.body.userId = req.user.id;
+    req.body.userId = req.user.referenceUser ?? req.user.id;
     
     const template = await Template.create(req.body);
     
@@ -72,7 +72,7 @@ exports.updateTemplate = async (req, res) => {
     let template = await Template.findOne({
       where: { 
         id: req.params.id,
-        userId: req.user.id
+        userId: req.user.referenceUser ?? req.user.id
       }
     });
     
@@ -104,7 +104,7 @@ exports.deleteTemplate = async (req, res) => {
     const template = await Template.findOne({
       where: { 
         id: req.params.id,
-        userId: req.user.id
+        userId: req.user.referenceUser ?? req.user.id
       }
     });
     
