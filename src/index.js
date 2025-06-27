@@ -23,6 +23,7 @@ app.use('/api/template', require('./routes/templateRoutes'));
 app.use('/api/messageConfig', require('./routes/messageConfigRoutes'));
 app.use('/api/messageHistory', require('./routes/messageHistoryRoutes'));
 app.use('/api/user', require('./routes/userRoutes'));
+app.use('/api/email', require('./routes/mailRoutes'));
 
 
 app.get('/', (req, res) => {
@@ -41,7 +42,7 @@ const PORT = process.env.PORT || 5000;
 const startServer = async () => {
   try {
     await connectDB();
-    //await syncModels();
+    //await syncModels(); 
 
     app.listen(PORT, () => {
       console.log(`Servidor rodando na porta ${PORT}`);

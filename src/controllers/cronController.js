@@ -1,21 +1,13 @@
 const cron = require('node-cron');
 const { Op } = require('sequelize');
 const MessageConfig = require('../models/MessageConfig');
-const WhatsappController = require('../controllers/whatsappController');
-const MailController = require('../controllers/mailController');
 const { Contact } = require('../models');
 require('dotenv').config();
 
-const { Queue, Worker } = require('bullmq');
+const { Queue } = require('bullmq');
 const IORedis = require('ioredis');
 const connection = new IORedis({ host: process.env.REDIS_HOST, port: process.env.REDIS_PORT, maxRetriesPerRequest: null });
 const notificationQueue = new Queue('notifications', { connection });
-
-const worker = new Worker('notifications', async job => {
-  const { type, contact, message } = job.data;
-
-  sendNotification(type, contact, message);
-}, { connection });
 
 async function executeScheduledMessages() {
     const now = new Date();
@@ -56,28 +48,6 @@ async function executeScheduledMessages() {
         }
     } catch (error) {
         console.error('Erro ao executar tarefas agendadas:', error);
-    }
-}
-
-async function sendNotification(type, contact, message) {
-    if (type === 'email') {
-        MailController.sendMail(message, contact);
-    } else if (type === 'sms') {
-
-    } else if (type === 'whatsapp') {
-        const updatedMessageTemplate = JSON.parse(JSON.stringify(message.template.components)).map(component => {
-            if (component.parameters) {
-                component.parameters = component.parameters.map(param => {
-                if (param.type === 'contact') {
-                    param.type = 'text';
-                    param.text = contact.name;
-                }
-                return param;
-                });
-            }
-            return component;
-        });
-        WhatsappController.sendFirstMessageFromCron(message.userId, contact.phone, message.template.key_wpp, message.template.template_wpp, message.template.phone_number_id, updatedMessageTemplate);
     }
 }
 

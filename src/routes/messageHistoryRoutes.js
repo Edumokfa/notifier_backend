@@ -1,6 +1,6 @@
 const express = require('express');
 const { 
-  getHistories,
+  getHistories, getMessageStats, getTimeSeriesStats
 } = require('../controllers/MessageHistoryController');
 const { protect } = require('../middleware/auth');
 
@@ -10,5 +10,9 @@ router.use(protect);
 
 router.route('/')
   .get(getHistories);
+
+router.route('/messageStats').get(getMessageStats);
+router.route('/timeSeriesStats').get(getTimeSeriesStats);
+
 
 module.exports = router;

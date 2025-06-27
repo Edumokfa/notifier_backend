@@ -1,36 +1,51 @@
 require('dotenv').config();
-const nodemailer = require('nodemailer');
 
-const { createHistory } = require('./MessageHistoryController');
+const { Queue } = require('bullmq');
+const IORedis = require('ioredis');
+const connection = new IORedis({ host: process.env.REDIS_HOST, port: process.env.REDIS_PORT, maxRetriesPerRequest: null });
+const notificationQueue = new Queue('notifications', { connection });
 
 async function sendMail(message, contact) {
-    const { username, password, smtpServer, smtpPort } = message.emailConfig;
+  const payload = {
+    type: 'email',
+    contact: contact,
+    message: message,
+  };
 
-    const transporter = nodemailer.createTransport({
-      host: smtpServer,
-      port: parseInt(smtpPort),
-      secure: smtpPort == 465, // depende se o SMTP usa SSL/TLS. Para porta 465 geralmente é true.
-      auth: {
-        user: username,
-        pass: password 
-      }
-    });
-
-    const mailOptions = {
-      from: `"Sistema" <${username}>`,
-      to: contact.email,
-      subject: 'Notificação do Sistema',
-      text: 'Olá, esta é uma notificação do sistema.',
+  try {
+    await notificationQueue.add('sendNotification', payload);
+    return { success: true, status: 'queued' };
+} catch (error) {
+    return {
+        error: 'queue_error',
+        message: error.message,
     };
-
-    try {
-      const info = await transporter.sendMail(mailOptions);
-      console.log('Email enviado:', info.response);
-      createHistory(message.userId, contact.email, mailOptions, info, 200, null, 'sent', 'email');
-    } catch (error) {
-      console.error('Erro ao enviar email:', error);
-      createHistory(message.userId, contact.email, mailOptions, error, 400, null, 'error', 'email');
-    }
+}
 };
 
-module.exports = { sendMail };
+async function sendTest(req, res) {
+  const { test_email, name, email_subject, email_body, emailConfig, userId } = req.body;
+  const fakeMessage = {
+    userId,
+    emailConfig,
+    template: {
+      email_subject: email_subject || "Assunto de Teste",
+      email_body: email_body || "Olá {{cliente}}, este é um e-mail de teste do sistema."
+    }
+  };
+
+  const fakeContact = {
+    name: name || "Usuário de Teste",
+    email: test_email
+  };
+
+  try {
+    await sendMail(fakeMessage, fakeContact);
+    res.status(200).json({ success: true, message: 'E-mail de teste enviado com sucesso.' });
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Erro ao enviar e-mail de teste.', error: err.message });
+  }
+}
+
+
+module.exports = { sendMail, sendTest };

@@ -14,19 +14,19 @@ const Template = sequelize.define('Template', {
     },
     key_wpp: {
         type: DataTypes.TEXT,
-        allowNull: false
+        allowNull: true
     },
     template_wpp: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: true
     },
     phone_number_id: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: true
     },
     components: {
         type: DataTypes.JSON,
-        allowNull: false
+        allowNull: true
     },
     userId: {
         type: DataTypes.INTEGER,
@@ -36,6 +36,19 @@ const Template = sequelize.define('Template', {
         },
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE'
+    },
+    type: {
+        type: DataTypes.ENUM('whatsapp', 'email'),
+        defaultValue: 'whatsapp',
+        allowNull: true
+    },
+    email_body: {
+        type: DataTypes.TEXT,
+        allowNull: true
+    },
+    email_subject: {
+        type: DataTypes.STRING,
+        allowNull: true
     }
     }, {
     sequelize,

@@ -63,7 +63,6 @@ const MessageConfig = sequelize.define('MessageConfig', {
       key: 'id'
     }
   },
-  
   status: {
     type: DataTypes.ENUM('active', 'inactive', 'paused'),
     defaultValue: 'active'

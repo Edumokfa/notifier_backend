@@ -1,8 +1,12 @@
 const axios = require('axios');
 require('dotenv').config();
 
-const { createHistory } = require('../controllers/MessageHistoryController');
-const { MessageHistory, User } = require('../models');
+const { MessageHistory, User, Contact } = require('../models');
+
+const { Queue } = require('bullmq');
+const IORedis = require('ioredis');
+const connection = new IORedis({ host: process.env.REDIS_HOST, port: process.env.REDIS_PORT, maxRetriesPerRequest: null });
+const notificationQueue = new Queue('notifications', { connection });
 
 exports.webhook = async (req, res) => {
     const data = req.body;
@@ -45,18 +49,12 @@ exports.configureWebhook = async (req, res) => {
   };
 
 exports.sendFirstMessage = async (req, res) => {
-    var response = await sendFirstMessage(req.user.referenceUser ?? req.user.id, req.body.phone_number, req.body.key_wpp, req.body.template_wpp, req.body.phone_number_id, req.body.components);
+    var response = await sendFirstMessage(req.user.referenceUser ?? req.user.id, req.body);
     if (response.error) {
         return res.status(400).json({ error: response });
     }
     return res.status(200).json(response);
 }
-
-exports.sendFirstMessageFromCron = async (userId, phoneNumber, keyWpp, templateWpp, phoneNumberId, components) => {
-    var response = await sendFirstMessage(userId, phoneNumber, keyWpp, templateWpp, phoneNumberId, components);
-    return !response.error;
-}
-
 
 // Função para enviar uma mensagem via WhatsApp
 async function sendWhatsappMessage(phoneNumber, message, phoneNumberId, keyWpp) {
@@ -76,32 +74,28 @@ async function sendWhatsappMessage(phoneNumber, message, phoneNumberId, keyWpp) 
     }
 }
 
-async function sendFirstMessage(userId, phoneNumber, keyWpp, templateWpp, phoneNumberId, components) {
-    const url = `${process.env.FACEBOOK_API_URL}${phoneNumberId}/messages?access_token=${keyWpp}`;
-
-    const updatedComponents = components.map(({ text, ...rest }) => rest);
-
+async function sendFirstMessage(userId, body) {
     const message = {
-        messaging_product: 'whatsapp',
-        to: phoneNumber,
-        type: 'template',
-        template: {
-            name: templateWpp,
-            language: { code: 'pt_BR' },
-            components: updatedComponents,
-        },
+        userId: userId,
+        template: body
+    }
+    
+    const fullContact = {
+        phone: body.phone_number,
+    }
+    const payload = {
+        type: 'whatsapp',
+        contact: fullContact,
+        message: message,
     };
 
     try {
-        const response = await axios.post(url, message);
-        createHistory(userId, phoneNumber, message, response.data, 200, response.data.messages[0].id, 'sent', 'whatsapp');
-        return response.data;
+        await notificationQueue.add('sendNotification', payload);
+        return { success: true, status: 'queued' };
     } catch (error) {
-        createHistory(userId, phoneNumber, message, error.response?.data, error.response?.status || 500, null, 'failed', 'whatsapp');
         return {
-            error: error.response?.status || 500,
+            error: 'queue_error',
             message: error.message,
-            details: error.response?.data || 'Sem resposta do servidor',
         };
     }
 }

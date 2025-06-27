@@ -2,9 +2,6 @@ const MessageConfig = require('../models/MessageConfig');
 const Template = require('../models/Template');
 const { Op } = require('sequelize');
 
-// @desc    Criar nova configuração de mensagem
-// @route   POST /api/message-configs
-// @access  Private
 exports.createMessageConfig = async (req, res) => {
   try {
     const { 
@@ -50,9 +47,6 @@ exports.createMessageConfig = async (req, res) => {
   }
 };
 
-// @desc    Listar configurações de mensagem do usuário
-// @route   GET /api/message-configs
-// @access  Private
 exports.getMessageConfigs = async (req, res) => {
   try {
     const messageConfigs = await MessageConfig.findAll({
@@ -81,9 +75,6 @@ exports.getMessageConfigs = async (req, res) => {
   }
 };
 
-// @desc    Atualizar configuração de mensagem
-// @route   PUT /api/message-configs/:id
-// @access  Private
 exports.updateMessageConfig = async (req, res) => {
   try {
     const { id } = req.params;
@@ -142,9 +133,6 @@ exports.updateMessageConfig = async (req, res) => {
   }
 };
 
-// @desc    Excluir configuração de mensagem
-// @route   DELETE /api/message-configs/:id
-// @access  Private
 exports.deleteMessageConfig = async (req, res) => {
   try {
     const { id } = req.params;
